@@ -197,10 +197,14 @@ function App() {
       if (startNode) {
         ctx.strokeStyle = '#10b981';
         ctx.lineWidth = 2;
-        ctx.setLineDash([5, 5]);
+        if (ctx.setLineDash) {
+          ctx.setLineDash([5, 5]);
+        }
         ctx.beginPath();
         ctx.moveTo(startNode.x, startNode.y);
-        ctx.lineTo(startNode.x + 50, startNode.y + 50);
+        if (ctx.setLineDash) {
+          ctx.setLineDash([]);
+        }
         ctx.stroke();
         ctx.setLineDash([]);
       }
