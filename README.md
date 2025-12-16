@@ -2,7 +2,7 @@
 
 An interactive web application for optimizing campus tours at Universidad San Francisco de Quito (USFQ). The tool uses optimization algorithms to find the best route that visits the maximum number of locations within a given time limit.
 
-<img width="962" height="615" alt="Screenshot 2025-12-16 at 5 14 23 PM" src="https://github.com/user-attachments/assets/b506f0ad-2802-4bf0-ba0d-fbb838d0718f"/>
+<img width="769" height="492" alt="Screenshot 2025-12-16 at 5 14 23 PM" src="https://github.com/user-attachments/assets/b506f0ad-2802-4bf0-ba0d-fbb838d0718f"/>
 
 ## ✨ Features
 
