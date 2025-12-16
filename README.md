@@ -1,8 +1,8 @@
-# 🎓 USFQ Campus Tour Optimizer
+<img width="1283" height="820" alt="Screenshot 2025-12-16 at 5 14 23 PM" src="https://github.com/user-attachments/assets/b506f0ad-2802-4bf0-ba0d-fbb838d0718f" /># 🎓 USFQ Campus Tour Optimizer
 
 An interactive web application for optimizing campus tours at Universidad San Francisco de Quito (USFQ). The tool uses optimization algorithms to find the best route that visits the maximum number of locations within a given time limit.
 
-![Campus Tour Optimization](src/USFQ_campus_map.png)
+![Campus Tour Optimization]([Uploading Screenshot 2025-12-16 at 5.14.23 PM.png…]())
 
 ## ✨ Features
 
@@ -16,7 +16,7 @@ An interactive web application for optimizing campus tours at Universidad San Fr
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone <https://github.com/rmandors/Campus-Tour-Optimization>
 cd USFQ-campus-tour-optimization
 ```
 
