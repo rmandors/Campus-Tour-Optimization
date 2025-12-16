@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Play } from 'lucide-react';
-import campusMap from './USFQ_campus_map.png';
+import campusMap from './assets/USFQ_campus_map.png';
 
 function App() {
   const canvasRef = useRef(null);
