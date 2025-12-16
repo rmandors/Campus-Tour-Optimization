@@ -5,13 +5,20 @@ import campusMap from './USFQ_campus_map.png';
 function App() {
   const canvasRef = useRef(null);
   const imageRef = useRef(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const [nodes, setNodes] = useState([
-    { id: 1, name: 'Entrada Principal', x: 100, y: 200 },
-    { id: 2, name: 'Biblioteca', x: 250, y: 150 },
-    { id: 3, name: 'Cafetería', x: 400, y: 180 },
-    { id: 4, name: 'Lab Computación', x: 350, y: 300 },
-    { id: 5, name: 'Auditorio', x: 200, y: 350 },
-    { id: 6, name: 'Gimnasio', x: 500, y: 250 }
+    { id: 1, name: 'Main Entrance', x: 496, y: 675 },
+    { id: 2, name: 'Main Gardens', x: 421, y: 544 },
+    { id: 3, name: 'Main Hall', x: 344, y: 379 },
+    { id: 4, name: 'Calderón de la Barca Theater', x: 261, y: 396 },
+    { id: 5, name: 'Restaurant', x: 231, y: 346 },
+    { id: 6, name: 'Academic Plaza', x: 250, y: 295 },
+    { id: 7, name: 'Pagoda', x: 806, y: 367 },
+    { id: 8, name: 'Alexandros Coliseum', x: 902, y: 405 },
+    { id: 9, name: 'Bridge', x: 1201, y: 544 },
+    { id: 10, name: 'Hayek Complex', x: 1419, y: 511 },
+    { id: 11, name: 'Shakespeare Theater', x: 1467, y: 435 },
+    { id: 12, name: 'Dragon Shop', x: 1559, y: 547 }
   ]);
   
   const [edges, setEdges] = useState([]);
@@ -26,29 +33,36 @@ function App() {
     img.src = campusMap;
     img.onload = () => {
       imageRef.current = img;
+      setImageLoaded(true);
     };
   }, []);
   
   useEffect(() => {
-    // Generate default edges only once on mount
-    const newEdges = [];
+    // Initialize with fixed edge weights - fully connected graph
+    const initialEdges = [];
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
         const dist = Math.sqrt(
           Math.pow(nodes[i].x - nodes[j].x, 2) + 
           Math.pow(nodes[i].y - nodes[j].y, 2)
         );
-        const time = Math.round(dist / 20);
-        newEdges.push({
+        const time = Math.round(dist / 20); 
+        
+        initialEdges.push({
           from: nodes[i].id,
           to: nodes[j].id,
           time: time
         });
       }
     }
-    if (newEdges.length > 0) {
-      setEdges(newEdges);
-    }
+    
+    // const initialEdges = [
+    //   { from: 1, to: 2, time: 3 },
+    //   { from: 1, to: 3, time: 5 },
+    //   // ... add all your edges here
+    // ];
+    
+    setEdges(initialEdges);
   }, []);
   
   const drawCanvas = useCallback(() => {
@@ -58,15 +72,15 @@ function App() {
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Draw background image if loaded with transparency
-    if (imageRef.current) {
+    // Draw background image if loaded 
+    if (imageRef.current && imageLoaded) {
       ctx.save();
-      ctx.globalAlpha = 0.8; // Make background 60% opaque (40% transparent)
+      ctx.globalAlpha = 0.8; 
       ctx.drawImage(imageRef.current, 0, 0, canvas.width, canvas.height);
       ctx.restore();
     }
     
-    // Dibujar aristas
+    // Draw edges
     ctx.strokeStyle = '#ddd';
     ctx.lineWidth = 1;
     edges.forEach(edge => {
@@ -86,7 +100,7 @@ function App() {
       }
     });
     
-    // Dibujar ruta solución
+    // Draw solution route
     if (solution) {
       ctx.strokeStyle = '#3b82f6';
       ctx.lineWidth = 3;
@@ -99,7 +113,7 @@ function App() {
           ctx.lineTo(to.x, to.y);
           ctx.stroke();
           
-          // Flecha
+          // Arrow
           const angle = Math.atan2(to.y - from.y, to.x - from.x);
           const arrowSize = 10;
           ctx.beginPath();
@@ -119,7 +133,7 @@ function App() {
       }
     }
     
-    // Dibujar nodos
+    // Draw nodes
     nodes.forEach((node, idx) => {
       const isInSolution = solution && solution.route.includes(node.id);
       const isStartNode = startNode === node.id;
@@ -139,7 +153,7 @@ function App() {
       ctx.textBaseline = 'middle';
       ctx.fillText(node.id.toString(), node.x, node.y);
     });
-  }, [nodes, edges, solution, startNode]);
+  }, [nodes, edges, solution, startNode, imageLoaded]);
   
   useEffect(() => {
     drawCanvas();
@@ -175,6 +189,7 @@ function App() {
   const greedyOrienteering = (startNodeId) => {
     const visited = new Set([startNodeId]);
     const route = [startNodeId];
+    const transitionTimes = []; // Store time for each transition
     let currentNode = startNodeId;
     let totalTime = 0;
     
@@ -188,7 +203,7 @@ function App() {
         const travelTime = getEdgeTime(currentNode, node.id);
         if (totalTime + travelTime > timeLimit) continue;
         
-        // Choose closest unvisited node (all nodes have equal importance)
+        // Choose closest unvisited node
         if (travelTime < bestTime) {
           bestTime = travelTime;
           bestNode = node.id;
@@ -199,11 +214,12 @@ function App() {
       
       visited.add(bestNode);
       route.push(bestNode);
+      transitionTimes.push(bestTime); // Store the transition time
       totalTime += bestTime;
       currentNode = bestNode;
     }
     
-    return { route, totalTime, totalValue: route.length };
+    return { route, totalTime, totalValue: route.length, transitionTimes };
   };
   
   const optimize = () => {
@@ -252,7 +268,7 @@ function App() {
         </h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-          {/* Panel de control */}
+          {/* Control panel */}
           <div className="space-y-3">
             <div className="bg-blue-50 p-3 rounded-lg">
               <h3 className="font-semibold text-gray-700 mb-2 text-sm">⚙️ Configuración</h3>
@@ -299,9 +315,13 @@ function App() {
                     <ol className="mt-1 space-y-0.5 text-xs">
                       {solution.route.map((nodeId, idx) => {
                         const node = nodes.find(n => n.id === nodeId);
+                        const transitionTime = solution.transitionTimes && solution.transitionTimes[idx - 1];
                         return (
                           <li key={idx} className="text-gray-700">
                             {idx + 1}. {node?.name}
+                            {transitionTime !== undefined && idx > 0 && (
+                              <span className="text-blue-600 ml-1">({transitionTime} min)</span>
+                            )}
                           </li>
                         );
                       })}
