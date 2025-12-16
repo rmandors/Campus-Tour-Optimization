@@ -224,7 +224,7 @@ function App() {
   
   const optimize = () => {
     if (!startNode) {
-      alert('Por favor selecciona un punto de inicio haciendo clic en un nodo');
+      alert('Por favor, selecciona un punto de inicio haciendo click en un nodo.');
       return;
     }
     
@@ -264,7 +264,7 @@ function App() {
     <div className="w-full h-screen bg-gray-50 p-4">
       <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-lg p-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          🎓 Optimizador de Recorrido Campus
+          🎓 Optimizador de Recorrido Campus USFQ
         </h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
