@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play } from 'lucide-react';
+import { Play, Sparkles } from 'lucide-react';
 import campusMap from './assets/USFQ_campus_map.png';
 
 function App() {
@@ -26,6 +26,8 @@ function App() {
   const [solution, setSolution] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [startNode, setStartNode] = useState(null);
+  const [currentTry, setCurrentTry] = useState(null);
+  const [isFindingBest, setIsFindingBest] = useState(false);
   
   // Load background image
   useEffect(() => {
@@ -138,22 +140,24 @@ function App() {
       const isInSolution = solution && solution.route.includes(node.id);
       const isStartNode = startNode === node.id;
       const isRouteStart = solution && solution.route[0] === node.id;
+      const isRouteEnd = solution && solution.route.length > 0 && solution.route[solution.route.length - 1] === node.id && solution.route[0] === node.id && solution.route.length > 1;
+      const isCurrentTry = currentTry && currentTry.nodeId === node.id;
       
       ctx.beginPath();
       ctx.arc(node.x, node.y, 20, 0, 2 * Math.PI);
-      ctx.fillStyle = isRouteStart ? '#10b981' : isInSolution ? '#3b82f6' : isStartNode ? '#fbbf24' : '#f3f4f6';
+      ctx.fillStyle = isCurrentTry ? '#a855f7' : isRouteStart ? '#10b981' : isInSolution ? '#3b82f6' : isStartNode ? '#fbbf24' : '#f3f4f6';
       ctx.fill();
-      ctx.strokeStyle = isStartNode ? '#ef4444' : '#6b7280';
-      ctx.lineWidth = isStartNode ? 3 : 2;
+      ctx.strokeStyle = isCurrentTry ? '#7c3aed' : isStartNode ? '#ef4444' : '#6b7280';
+      ctx.lineWidth = isCurrentTry ? 4 : isStartNode ? 3 : 2;
       ctx.stroke();
       
-      ctx.fillStyle = isInSolution || isRouteStart ? '#fff' : '#000';
+      ctx.fillStyle = isInSolution || isRouteStart || isCurrentTry ? '#fff' : '#000';
       ctx.font = 'bold 12px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(node.id.toString(), node.x, node.y);
     });
-  }, [nodes, edges, solution, startNode, imageLoaded]);
+  }, [nodes, edges, solution, startNode, imageLoaded, currentTry]);
   
   useEffect(() => {
     drawCanvas();
@@ -201,7 +205,9 @@ function App() {
         if (visited.has(node.id)) continue;
         
         const travelTime = getEdgeTime(currentNode, node.id);
-        if (totalTime + travelTime > timeLimit) continue;
+        // Reserve time for return trip to start
+        const returnTime = getEdgeTime(node.id, startNodeId);
+        if (totalTime + travelTime + returnTime > timeLimit) continue;
         
         // Choose closest unvisited node
         if (travelTime < bestTime) {
@@ -219,6 +225,14 @@ function App() {
       currentNode = bestNode;
     }
     
+    // Add return trip to starting node
+    const returnTime = getEdgeTime(currentNode, startNodeId);
+    if (totalTime + returnTime <= timeLimit) {
+      route.push(startNodeId);
+      transitionTimes.push(returnTime);
+      totalTime += returnTime;
+    }
+    
     return { route, totalTime, totalValue: route.length, transitionTimes };
   };
   
@@ -230,12 +244,52 @@ function App() {
     
     setIsRunning(true);
     setSolution(null);
+    setCurrentTry(null);
     
     setTimeout(() => {
       const sol = greedyOrienteering(startNode);
       setSolution(sol);
       setIsRunning(false);
     }, 100);
+  };
+
+  const findBestRoute = async () => {
+    setIsFindingBest(true);
+    setSolution(null);
+    setCurrentTry(null);
+    setStartNode(null);
+    
+    let bestSolution = null;
+    let bestScore = -1;
+    
+    // Try each node as a starting point
+    for (let i = 0; i < nodes.length; i++) {
+      const nodeId = nodes[i].id;
+      setCurrentTry({ nodeId, index: i + 1, total: nodes.length });
+      
+      // Show visual feedback with a delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      const sol = greedyOrienteering(nodeId);
+      
+      // Score based on number of places visited (prioritize more places)
+      // If same number of places, prefer shorter time
+      const score = sol.route.length * 1000 - sol.totalTime;
+      
+      if (score > bestScore) {
+        bestScore = score;
+        bestSolution = { ...sol, startNode: nodeId };
+      }
+      
+      // Temporarily show this solution for visual feedback
+      setSolution({ ...sol, startNode: nodeId });
+    }
+    
+    // Set the best solution
+    setSolution(bestSolution);
+    setStartNode(bestSolution.startNode);
+    setCurrentTry(null);
+    setIsFindingBest(false);
   };
   
   
@@ -287,15 +341,36 @@ function App() {
               
               <button
                 onClick={optimize}
-                disabled={isRunning}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 disabled:bg-gray-400"
+                disabled={isRunning || isFindingBest}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 disabled:bg-gray-400 mb-2"
               >
                 <Play className="w-4 h-4" />
                 {isRunning ? 'Calculando...' : 'Optimizar Ruta'}
               </button>
+              
+              <button
+                onClick={findBestRoute}
+                disabled={isRunning || isFindingBest}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 disabled:bg-gray-400"
+              >
+                <Sparkles className="w-4 h-4" />
+                {isFindingBest ? 'Buscando mejor ruta...' : 'Encontrar Mejor Ruta'}
+              </button>
             </div>
             
-            {startNode && (
+            {currentTry && (
+              <div className="bg-purple-50 p-3 rounded-lg border-2 border-purple-300">
+                <h3 className="font-semibold text-gray-700 mb-1 text-sm">🔄 Probando Rutas</h3>
+                <p className="text-xs text-gray-600">
+                  Probando nodo {currentTry.nodeId}: {nodes.find(n => n.id === currentTry.nodeId)?.name}
+                </p>
+                <p className="text-xs text-purple-600 mt-1">
+                  {currentTry.index} de {currentTry.total}
+                </p>
+              </div>
+            )}
+            
+            {startNode && !currentTry && (
               <div className="bg-yellow-50 p-3 rounded-lg">
                 <h3 className="font-semibold text-gray-700 mb-1 text-sm">📍 Punto de Inicio</h3>
                 <p className="text-xs text-gray-600">
@@ -308,7 +383,7 @@ function App() {
               <div className="bg-green-50 p-3 rounded-lg">
                 <h3 className="font-semibold text-gray-700 mb-2 text-sm">✅ Solución</h3>
                 <div className="space-y-1 text-xs">
-                  <p><strong>Lugares:</strong> {solution.route.length}</p>
+                  <p><strong>Lugares visitados:</strong> {new Set(solution.route).size}</p>
                   <p><strong>Tiempo:</strong> {solution.totalTime} min</p>
                   <div className="mt-2">
                     <strong>Recorrido:</strong>

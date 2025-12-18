@@ -9,6 +9,9 @@ An interactive web application for optimizing campus tours at Universidad San Fr
 - **Interactive Visual Interface**: Campus map with nodes representing points of interest.
 - **Starting Point Selection**: Click on any node to set it as the starting point.
 - **Route Optimization**: Greedy algorithm that finds the best route considering available time.
+- **Closed Tour**: Routes automatically return to the starting point, creating a complete tour cycle.
+- **Find Best Route**: Automatically tests all possible starting points and finds the optimal route.
+- **Visual Feedback**: See real-time testing of different routes when using the "Find Best Route" feature.
 - **Results Visualization**: Displays the optimized route with transition times between locations.
 - **Flexible Configuration**: Adjust the time limit according to your needs.
 
@@ -34,13 +37,16 @@ npm run dev
 
 ## 📖 Usage
 
-1. **Select Starting Point**: Click on any node on the map to set it as the starting point.
+1. **Select Starting Point** (Optional): Click on any node on the map to set it as the starting point.
 2. **Set Time Limit**: Enter the maximum available time (in minutes) in the corresponding field.
-3. **Optimize Route**: Press the "Optimizar Ruta" button to calculate the best route.
+3. **Optimize Route**: 
+   - **"Optimizar Ruta"**: Calculates the best route from the selected starting point (requires selecting a node first).
+   - **"Encontrar Mejor Ruta"**: Automatically tests all possible starting points and finds the optimal route. This feature shows visual feedback as it tries each node.
 4. **Review Results**: The solution will display:
-   - Number of visited locations.
-   - Total route time.
-   - Detailed route list with transition times.
+   - Number of unique visited locations.
+   - Total route time (including return to starting point).
+   - Detailed route list with transition times between locations.
+   - The route will always end at the starting point, creating a closed tour.
 
 ## 🛠️ Technologies
 
