@@ -40,29 +40,75 @@ function App() {
   }, []);
   
   useEffect(() => {
-    // Initialize with fixed edge weights - fully connected graph
-    const initialEdges = [];
-    for (let i = 0; i < nodes.length; i++) {
-      for (let j = i + 1; j < nodes.length; j++) {
-        const dist = Math.sqrt(
-          Math.pow(nodes[i].x - nodes[j].x, 2) + 
-          Math.pow(nodes[i].y - nodes[j].y, 2)
-        );
-        const time = Math.round(dist / 20); 
-        
-        initialEdges.push({
-          from: nodes[i].id,
-          to: nodes[j].id,
-          time: time
-        });
-      }
-    }
-    
-    // const initialEdges = [
-    //   { from: 1, to: 2, time: 3 },
-    //   { from: 1, to: 3, time: 5 },
-    //   // ... add all your edges here
-    // ];
+    // Initialize with fixed edge weights - fully connected graph    
+    const initialEdges = [
+       { from: 1, to: 2, time: 3 },
+       { from: 1, to: 3, time: 5 },
+       { from: 1, to: 4, time: 6 },
+       { from: 1, to: 5, time: 7 },
+       { from: 1, to: 6, time: 8 },
+       { from: 1, to: 7, time: 10 },
+       { from: 1, to: 8, time: 12 },
+       { from: 1, to: 9, time: 15 },
+       { from: 1, to: 10, time: 18 },
+       { from: 1, to: 11, time: 20 },
+       { from: 1, to: 12, time: 22 },
+       { from: 2, to: 3, time: 4 },
+       { from: 2, to: 4, time: 5 },
+       { from: 2, to: 5, time: 6 },
+       { from: 2, to: 6, time: 7 },
+       { from: 2, to: 7, time: 9 },
+       { from: 2, to: 8, time: 11 },
+       { from: 2, to: 9, time: 14 },
+       { from: 2, to: 10, time: 17 },
+       { from: 2, to: 11, time: 19 },
+       { from: 2, to: 12, time: 21 },
+       { from: 3, to: 4, time: 2 },
+       { from: 3, to: 5, time: 3 },
+       { from: 3, to: 6, time: 4 },
+       { from: 3, to: 7, time: 6 },
+       { from: 3, to: 8, time: 8 },
+       { from: 3, to: 9, time: 11 },
+       { from: 3, to: 10, time: 14 },
+       { from: 3, to: 11, time: 16 },
+       { from: 3, to: 12, time: 18 },
+       { from: 4, to: 5, time: 1 },
+       { from: 4, to: 6, time: 2 },
+       { from: 4, to: 7, time: 3 },
+       { from: 4, to: 8, time: 5 },
+       { from: 4, to: 9, time: 8 },
+       { from: 4, to: 10, time: 11 },
+       { from: 4, to: 11, time: 13 },
+       { from: 4, to: 12, time: 15 },
+       { from: 5, to: 6, time: 1 },
+       { from: 5, to: 7, time: 2 },
+       { from: 5, to: 8, time: 4 },
+       { from: 5, to: 9, time: 7 },
+       { from: 5, to: 10, time: 10 },
+       { from: 5, to: 11, time: 12 },
+       { from: 5, to: 12, time: 14 },
+       { from: 6, to: 7, time: 1 },
+       { from: 6, to: 8, time: 3 },
+       { from: 6, to: 9, time: 6 },
+       { from: 6, to: 10, time: 9 },
+       { from: 6, to: 11, time: 11 },
+       { from: 6, to: 12, time: 13 },
+       { from: 7, to: 8, time: 2 },
+       { from: 7, to: 9, time: 5 },
+       { from: 7, to: 10, time: 8 },
+       { from: 7, to: 11, time: 10 },
+       { from: 7, to: 12, time: 12 },
+       { from: 8, to: 9, time: 3 },
+       { from: 8, to: 10, time: 6 },
+       { from: 8, to: 11, time: 8 },
+       { from: 8, to: 12, time: 10 },
+       { from: 9, to: 10, time: 3 },
+       { from: 9, to: 11, time: 5 },
+       { from: 9, to: 12, time: 7 },
+       { from: 10, to: 11, time: 2 },
+       { from: 10, to: 12, time: 4 },
+       { from: 11, to: 12, time: 2 },
+    ];
     
     setEdges(initialEdges);
   }, []);
